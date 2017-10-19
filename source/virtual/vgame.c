@@ -61,7 +61,7 @@
 #define NAME_NDS_DATADIR    "data"
 
 
-static u64 vgame_type = 0;
+static u32 vgame_type = 0;
 static u32 base_vdir = 0;
 
 static VirtualFile* templates_cia   = (VirtualFile*) VGAME_BUFFER; // first 56kb reserved (enough for 1024 entries)
@@ -634,8 +634,8 @@ bool BuildVGameFirmDir(void) {
     return true;
 }
 
-u64 InitVGameDrive(void) { // prerequisite: game file mounted as image
-    u64 type = GetMountState();
+u32 InitVGameDrive(void) { // prerequisite: game file mounted as image
+    u32 type = GetMountState();
     
     vgame_type = 0;
     offset_firm  = (u64) -1;
@@ -909,7 +909,7 @@ bool ReadVGameDirNitro(VirtualFile* vfile, VirtualDir* vdir) {
 }
     
 bool ReadVGameDir(VirtualFile* vfile, VirtualDir* vdir) {
-    VirtualFile* templates = NULL;
+    VirtualFile* templates;
     int n = 0;
     
     if (vdir->flags & VFLAG_FIRM) {

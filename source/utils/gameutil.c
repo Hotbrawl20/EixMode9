@@ -595,7 +595,7 @@ u32 VerifyBossFile(const char* path) {
 }
 
 u32 VerifyGameFile(const char* path) {
-    u64 filetype = IdentifyFileType(path);
+    u32 filetype = IdentifyFileType(path);
     if (filetype & GAME_CIA)
         return VerifyCiaFile(path);
     else if (filetype & GAME_NCSD)
@@ -704,7 +704,7 @@ u32 CheckEncryptedBossFile(const char* path) {
 }
 
 u32 CheckEncryptedGameFile(const char* path) {
-    u64 filetype = IdentifyFileType(path);
+    u32 filetype = IdentifyFileType(path);
     if (filetype & GAME_CIA)
         return CheckEncryptedCiaFile(path);
     else if (filetype & GAME_NCSD)
@@ -985,7 +985,7 @@ u32 CryptCdnFile(const char* orig, const char* dest, u16 crypto) {
 }
 
 u32 CryptGameFile(const char* path, bool inplace, bool encrypt) {
-    u64 filetype = IdentifyFileType(path);
+    u32 filetype = IdentifyFileType(path);
     u16 crypto = encrypt ? CRYPTO_ENCRYPT : CRYPTO_DECRYPT;
     char dest[256];
     char* destptr = (char*) path;
@@ -1345,7 +1345,7 @@ u32 BuildCiaFromNcsdFile(const char* path_ncsd, const char* path_cia) {
 }
 
 u32 BuildCiaFromGameFile(const char* path, bool force_legit) {
-    u64 filetype = IdentifyFileType(path);
+    u32 filetype = IdentifyFileType(path);
     char dest[256];
     u32 ret = 0;
     
@@ -1388,7 +1388,7 @@ u32 BuildCiaFromGameFile(const char* path, bool force_legit) {
 
 // this has very limited uses right now
 u32 DumpCxiSrlFromTmdFile(const char* path) {
-    u64 filetype = 0;
+    u32 filetype = 0;
     char path_cxi[256];
     char dest[256];
     
@@ -1412,7 +1412,7 @@ u32 DumpCxiSrlFromTmdFile(const char* path) {
     return 0;
 }
 
-u32 ExtractCodeFromCxiFile(const char* path, const char* path_out, char* extstr) {
+u32 ExtractCodeFromCxiFile(const char* path, const char* path_out) {
     u8* code = (u8*) TEMP_BUFFER;
     u32 code_max_size = TEMP_BUFFER_EXTSIZE; // uses the extended temp buffer size
     
@@ -1422,28 +1422,19 @@ u32 ExtractCodeFromCxiFile(const char* path, const char* path_out, char* extstr)
     // load ncch, exthdr, .code
     u32 code_size;
     if ((LoadNcchHeaders(&ncch, &exthdr, NULL, path, 0) != 0) ||
-        ((LoadExeFsFile(code, path, 0, EXEFS_CODE_NAME, code_max_size, &code_size) != 0) &&
-         (LoadExeFsFile(code, path, 0, ".firm", code_max_size, &code_size) != 0)))
+        (LoadExeFsFile(code, path, 0, EXEFS_CODE_NAME, code_max_size, &code_size)))
         return 1;
     
     // decompress code (only if required)
     if ((exthdr.flag & 0x1) && (DecompressCodeLzss(code, &code_size, code_max_size) != 0))
         return 1;
     
-    // decide extension
-    char* ext = EXEFS_CODE_NAME;
-    if (code_size >= 0x200) {
-        if (ValidateFirmHeader((FirmHeader*)(void*) code, code_size) == 0) ext = ".firm";
-        else if (ValidateAgbHeader((AgbHeader*)(void*) code) == 0) ext = ".gba";
-    }
-    if (extstr) strncpy(extstr, ext, 7);
-    
     // build or take over output path
     char dest[256];
     if (!path_out) {
         // ensure the output dir exists
         if (fvx_rmkdir(OUTPUT_PATH) != FR_OK) return 1;
-        snprintf(dest, 256, OUTPUT_PATH "/%016llX%s%s", ncch.programId, (exthdr.flag & 0x1) ? ".dec" : "", ext);
+        snprintf(dest, 256, OUTPUT_PATH "/%016llX%s%s", ncch.programId, (exthdr.flag & 0x1) ? ".dec" : "", EXEFS_CODE_NAME);
     } else strncpy(dest, path_out, 256);
     if (!CheckWritePermissions(dest)) return 1;
     
@@ -1458,7 +1449,7 @@ u32 ExtractCodeFromCxiFile(const char* path, const char* path_out, char* extstr)
 }
 
 u32 LoadSmdhFromGameFile(const char* path, Smdh* smdh) {
-    u64 filetype = IdentifyFileType(path);
+    u32 filetype = IdentifyFileType(path);
     
     if (filetype & GAME_SMDH) { // SMDH file
         UINT btr;
@@ -1505,17 +1496,6 @@ u32 ShowSmdhTitleInfo(Smdh* smdh) {
     return 0;
 }
 
-u32 ShowGbaFileTitleInfo(const char* path) {
-    AgbHeader agb;
-    if ((fvx_qread(path, &agb, 0, sizeof(AgbHeader), NULL) != FR_OK) ||
-        (ValidateAgbHeader(&agb) != 0)) return 1;
-    ShowString("%.12s (AGB-%.4s)\n%s", agb.game_title, agb.game_code, AGB_DESTSTR(agb.game_code));
-    InputWait(0);
-    ClearScreenF(true, false, COLOR_STD_BG);
-    return 0;
-    
-}
-
 u32 ShowNdsFileTitleInfo(const char* path) {
     const u32 lwrap = 24;
     TwlIconData* twl_icon = (TwlIconData*) TEMP_BUFFER;
@@ -1542,11 +1522,10 @@ u32 ShowGameFileTitleInfo(const char* path) {
         path = path_content;
     }
     
-    // try loading SMDH, then try NDS / GBA
+    // try loading SMDH, then try NDS
     if (LoadSmdhFromGameFile(path, smdh) == 0)
         return ShowSmdhTitleInfo(smdh);
-    else if (ShowNdsFileTitleInfo(path) == 0) return 0;
-    else return ShowGbaFileTitleInfo(path);
+    else return ShowNdsFileTitleInfo(path);
 }
 
 u32 BuildNcchInfoXorpads(const char* destdir, const char* path) {
@@ -1716,7 +1695,242 @@ u32 InjectHealthAndSafety(const char* path, const char* destdrv) {
     }
     
     return ret;
+
 }
+
+
+u32 GetARGamesPaths(const char* drv, char* path_cxi, char* path_bak) {
+    const u32 tidlow_ar_path[] = { 0x00020E00 , 0x00021E00 , 0x00022E00 , 0 , 0x00026E00 , 0x00027E00 , 0x00028E00 }; //I am unsure of this array.
+    
+    // get AR Games title id low
+    u32 tidlow_ar = 0;
+    for (char secchar = 'C'; secchar >= 'A'; secchar--) {
+        char path_secinfo[32];
+        u8 secinfo[0x111];
+        u32 region = 0xFF;
+        UINT br;
+        snprintf(path_secinfo, 32, "%s/rw/sys/SecureInfo_%c", drv, secchar);
+        if ((fvx_qread(path_secinfo, secinfo, 0, 0x111, &br) != FR_OK) ||
+            (br != 0x111))
+            continue;
+        region = secinfo[0x100];
+        if (region >= sizeof(tidlow_ar_path) / sizeof(u32)) continue;
+        tidlow_ar = tidlow_ar_path[region];
+        break;
+    }
+    if (!tidlow_ar) return 1;
+    
+    // build paths
+    if (path_cxi) *path_cxi = '\0';
+    if (path_bak) *path_bak = '\0';
+    for (u32 i = 0; i < 8; i++) { // 8 is an arbitrary number
+        TitleMetaData* tmd = (TitleMetaData*) TEMP_BUFFER;
+        TmdContentChunk* chunk = (TmdContentChunk*) (tmd + 1);
+        char path_tmd[64];
+        snprintf(path_tmd, 64, "%s/title/00040010/%08lx/content/%08lx.tmd", drv, tidlow_ar, i);
+        if (LoadTmdFile(tmd, path_tmd) != 0) continue;
+        if (!getbe16(tmd->content_count)) return 1;
+        if (path_cxi) snprintf(path_cxi, 64, "%s/title/00040010/%08lx/content/%08lx.app", drv, tidlow_ar, getbe32(chunk->id));
+        if (path_bak) snprintf(path_bak, 64, "%s/title/00040010/%08lx/content/%08lx.bak", drv, tidlow_ar, getbe32(chunk->id));
+        break;
+    }
+    
+    return ((path_cxi && !*path_cxi) || (path_bak && !*path_bak)) ? 1 : 0;
+}
+
+u32 CheckARGamesInject(const char* hsdrv) {
+    char path_bak[64] = { 0 };
+    return ((GetARGamesPaths(hsdrv, NULL, path_bak) == 0) &&
+        (f_stat(path_bak, NULL) == FR_OK)) ? 0 : 1;
+}
+
+u32 InjectARGames(const char* path, const char* destdrv) {
+    NcchHeader ncch;
+        
+    // write permissions
+    if (!CheckWritePermissions(destdrv))
+        return 1;
+    
+    // legacy stuff - remove mark file
+    char path_mrk[32] = { 0 };
+    snprintf(path_mrk, 32, "%s/%s", destdrv, "__gm9_hsbak.pth");
+    f_unlink(path_mrk);
+    
+    // get AR Games paths
+    char path_cxi[64] = { 0 };
+    char path_bak[64] = { 0 };
+    if (GetARGamesPaths(destdrv, path_cxi, path_bak) != 0) return 1;
+    
+    if (!path) { // if path == NULL -> restore AR Games from backup
+        if (f_stat(path_bak, NULL) != FR_OK) return 1;
+        f_unlink(path_cxi);
+        f_rename(path_bak, path_cxi);
+        return 0;
+    }
+    
+    // check input file / crypto
+    if ((LoadNcchHeaders(&ncch, NULL, NULL, path, 0) != 0) ||
+        !(NCCH_IS_CXI(&ncch)) || (SetupNcchCrypto(&ncch, NCCH_NOCRYPTO) != 0))
+        return 1;
+    
+    // check crypto, get sig
+    if ((LoadNcchHeaders(&ncch, NULL, NULL, path_cxi, 0) != 0) ||
+        (SetupNcchCrypto(&ncch, NCCH_NOCRYPTO) != 0) || !(NCCH_IS_CXI(&ncch)))
+        return 1;
+    u8 sig[0x100];
+    memcpy(sig, ncch.signature, 0x100);
+    u16 crypto = NCCH_GET_CRYPTO(&ncch);
+    u64 tid_ar = ncch.programId;
+    
+    // make a backup copy if there is not already one (point of no return)
+    if (f_stat(path_bak, NULL) != FR_OK) {
+        if (f_rename(path_cxi, path_bak) != FR_OK) return 1;
+    } else f_unlink(path_cxi);
+    
+    // copy / decrypt the source CXI
+    u32 ret = 0;
+    if (CryptNcchNcsdBossFirmFile(path, path_cxi, GAME_NCCH, CRYPTO_DECRYPT, 0, 0, NULL, NULL) != 0)
+        ret = 1;
+    
+    // fix up the injected H&S NCCH header (copy H&S signature, title ID) 
+    if ((ret == 0) && (LoadNcchHeaders(&ncch, NULL, NULL, path_cxi, 0) == 0)) {
+        UINT bw;
+        ncch.programId = tid_ar;
+        ncch.partitionId = tid_ar;
+        memcpy(ncch.signature, sig, 0x100);
+        if ((fvx_qwrite(path_cxi, &ncch, 0, sizeof(NcchHeader), &bw) != FR_OK) ||
+            (bw != sizeof(NcchHeader)))
+            ret = 1;
+    } else ret = 1;
+    
+    // encrypt the CXI in place
+    if (CryptNcchNcsdBossFirmFile(path_cxi, path_cxi, GAME_NCCH, crypto, 0, 0, NULL, NULL) != 0)
+        ret = 1;
+    
+    if (ret != 0) { // in case of failure: try recover
+        f_unlink(path_cxi);
+        f_rename(path_bak, path_cxi);
+    }
+    
+    return ret;
+}//start sys applet (HomeMenu) Inject
+u32 GetHMPaths(const char* drv, char* path_cxi, char* path_bak) {
+    const u32 tidlow_hm_path[] = { 0x00008202, 0x00008F02, 0x00009802, 0,  0x0000A102, 0x0000A903, 0x0000B102 }; //this should work
+    
+    // get HM title id low
+    u32 tidlow_hm = 0;
+    for (char secchar = 'C'; secchar >= 'A'; secchar--) {
+        char path_secinfo[32];
+        u8 secinfo[0x111];
+        u32 region = 0xFF;
+        UINT br;
+        snprintf(path_secinfo, 32, "%s/rw/sys/SecureInfo_%c", drv, secchar);
+        if ((fvx_qread(path_secinfo, secinfo, 0, 0x111, &br) != FR_OK) ||
+            (br != 0x111))
+            continue;
+        region = secinfo[0x100];
+        if (region >= sizeof(tidlow_hm_path) / sizeof(u32)) continue;
+        tidlow_hm = tidlow_hm_path[region];
+        break;
+    }
+    if (!tidlow_hm) return 1;
+    
+    // build paths
+    if (path_cxi) *path_cxi = '\0';
+    if (path_bak) *path_bak = '\0';
+    for (u32 i = 0; i < 8; i++) { // 8 is an arbitrary number
+        TitleMetaData* tmd = (TitleMetaData*) TEMP_BUFFER;
+        TmdContentChunk* chunk = (TmdContentChunk*) (tmd + 1);
+        char path_tmd[64];
+        snprintf(path_tmd, 64, "%s/title/00040030/%08lx/content/%08lx.tmd", drv, tidlow_hm, i);
+        if (LoadTmdFile(tmd, path_tmd) != 0) continue;
+        if (!getbe16(tmd->content_count)) return 1;
+        if (path_cxi) snprintf(path_cxi, 64, "%s/title/00040030/%08lx/content/%08lx.app", drv, tidlow_hm, getbe32(chunk->id));
+        if (path_bak) snprintf(path_bak, 64, "%s/title/00040030/%08lx/content/%08lx.bak", drv, tidlow_hm, getbe32(chunk->id));
+        break;
+    }
+    
+    return ((path_cxi && !*path_cxi) || (path_bak && !*path_bak)) ? 1 : 0;
+}
+
+u32 CheckHMInject(const char* hsdrv) {
+    char path_bak[64] = { 0 };
+    return ((GetHMPaths(hsdrv, NULL, path_bak) == 0) &&
+        (f_stat(path_bak, NULL) == FR_OK)) ? 0 : 1;
+}
+
+u32 InjectHM(const char* path, const char* destdrv) {
+    NcchHeader ncch;
+        
+    // write permissions
+    if (!CheckWritePermissions(destdrv))
+        return 1;
+    
+    // legacy stuff - remove mark file
+    char path_mrk[32] = { 0 };
+    snprintf(path_mrk, 32, "%s/%s", destdrv, "__gm9_hsbak.pth");
+    f_unlink(path_mrk);
+    
+    // get HM paths
+    char path_cxi[64] = { 0 };
+    char path_bak[64] = { 0 };
+    if (GetHMPaths(destdrv, path_cxi, path_bak) != 0) return 1;
+    
+    if (!path) { // if path == NULL -> restore HM from backup
+        if (f_stat(path_bak, NULL) != FR_OK) return 1;
+        f_unlink(path_cxi);
+        f_rename(path_bak, path_cxi);
+        return 0;
+    }
+    
+    // check input file / crypto
+    if ((LoadNcchHeaders(&ncch, NULL, NULL, path, 0) != 0) ||
+        !(NCCH_IS_CXI(&ncch)) || (SetupNcchCrypto(&ncch, NCCH_NOCRYPTO) != 0))
+        return 1;
+    
+    // check crypto, get sig
+    if ((LoadNcchHeaders(&ncch, NULL, NULL, path_cxi, 0) != 0) ||
+        (SetupNcchCrypto(&ncch, NCCH_NOCRYPTO) != 0) || !(NCCH_IS_CXI(&ncch)))
+        return 1;
+    u8 sig[0x100];
+    memcpy(sig, ncch.signature, 0x100);
+    u16 crypto = NCCH_GET_CRYPTO(&ncch);
+    u64 tid_hm = ncch.programId;
+    
+    // make a backup copy if there is not already one (point of no return)
+    if (f_stat(path_bak, NULL) != FR_OK) {
+        if (f_rename(path_cxi, path_bak) != FR_OK) return 1;
+    } else f_unlink(path_cxi);
+    
+    // copy / decrypt the source CXI
+    u32 ret = 0;
+    if (CryptNcchNcsdBossFirmFile(path, path_cxi, GAME_NCCH, CRYPTO_DECRYPT, 0, 0, NULL, NULL) != 0)
+        ret = 1;
+    
+    // fix up the injected HM NCCH header (copy HM signature, title ID) 
+    if ((ret == 0) && (LoadNcchHeaders(&ncch, NULL, NULL, path_cxi, 0) == 0)) {
+        UINT bw;
+        ncch.programId = tid_hm;
+        ncch.partitionId = tid_hm;
+        memcpy(ncch.signature, sig, 0x100);
+        if ((fvx_qwrite(path_cxi, &ncch, 0, sizeof(NcchHeader), &bw) != FR_OK) ||
+            (bw != sizeof(NcchHeader)))
+            ret = 1;
+    } else ret = 1;
+    
+    // encrypt the CXI in place
+    if (CryptNcchNcsdBossFirmFile(path_cxi, path_cxi, GAME_NCCH, crypto, 0, 0, NULL, NULL) != 0)
+        ret = 1;
+    
+    if (ret != 0) { // in case of failure: try recover
+        f_unlink(path_cxi);
+        f_rename(path_bak, path_cxi);
+    }
+    
+    return ret;
+
+}//end sys applet (HomeMenu) inject
+
 
 u32 BuildTitleKeyInfo(const char* path, bool dec, bool dump) {
     TitleKeysInfo* tik_info = (TitleKeysInfo*) MAIN_BUFFER;
@@ -1736,7 +1950,7 @@ u32 BuildTitleKeyInfo(const char* path, bool dec, bool dump) {
         else return 0;
     }
     
-    u64 filetype = path_in ? IdentifyFileType(path_in) : 0;
+    u32 filetype = path_in ? IdentifyFileType(path_in) : 0;
     if (filetype & GAME_TICKET) {
         Ticket* ticket = (Ticket*) TEMP_BUFFER;
         if ((fvx_qread(path_in, ticket, 0, TICKET_SIZE, &br) != FR_OK) || (br != TICKET_SIZE) ||
@@ -1873,7 +2087,7 @@ u32 BuildSeedInfo(const char* path, bool dump) {
 }
 
 u32 LoadNcchFromGameFile(const char* path, NcchHeader* ncch) {
-    u64 filetype = IdentifyFileType(path);
+    u32 filetype = IdentifyFileType(path);
     UINT br;
     
     if (filetype & GAME_NCCH) {
@@ -1920,16 +2134,14 @@ u32 GetGoodName(char* name, const char* path, bool quick) {
     // name scheme (TWL+ICON): <title_id> <title_name> (<product_code>) (<DSi unitcode>) (<region>).<extension>
     // name scheme (NTR): <name_short> (<product_code>).<extension>
     // name scheme (TWL): <title_id> (<product_code>).<extension>
-    // name scheme (AGB): <name_short> (<product_code>).<extension>
     
     const char* path_donor = path;
-    u64 type_donor = IdentifyFileType(path);
+    u32 type_donor = IdentifyFileType(path);
     char* ext =
         (type_donor & GAME_CIA)  ? "cia" :
         (type_donor & GAME_NCSD) ? "3ds" :
         (type_donor & GAME_NCCH) ? ((type_donor & FLAG_CXI) ? "cxi" : "cfa") :
         (type_donor & GAME_NDS)  ? "nds" :
-        (type_donor & GAME_GBA)  ? "gba" :
         (type_donor & GAME_TMD)  ? "tmd" : "";
     if (!*ext) return 1;
     
@@ -1948,11 +2160,7 @@ u32 GetGoodName(char* name, const char* path, bool quick) {
         type_donor = IdentifyFileType(path_donor);
     }
     
-    if (type_donor & GAME_GBA) { // AGB
-        AgbHeader* agb = (AgbHeader*) TEMP_BUFFER;
-        if (fvx_qread(path_donor, agb, 0, sizeof(AgbHeader), NULL) != FR_OK) return 1;
-        snprintf(name, 128, "%.12s (AGB-%.4s).%s", agb->game_title, agb->game_code, ext);
-    } else if (type_donor & GAME_NDS) { // NTR or TWL
+    if (type_donor & GAME_NDS) { // NTR or TWL
         TwlHeader* twl = (TwlHeader*) TEMP_BUFFER;
         TwlIconData* icon = (TwlIconData*) (TEMP_BUFFER + sizeof(TwlHeader));
         if (LoadTwlMetaData(path_donor, twl, quick ? NULL : icon) != 0) return 1;

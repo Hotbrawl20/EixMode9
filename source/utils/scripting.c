@@ -689,19 +689,19 @@ bool run_cmd(cmd_id id, u32 flags, char** argv, char* err_str) {
         if (err_str) snprintf(err_str, _ERR_STR_LEN, "fixcmac failed");
     }
     else if (id == CMD_ID_VERIFY) {
-        u64 filetype = IdentifyFileType(argv[0]);
+        u32 filetype = IdentifyFileType(argv[0]);
         if (filetype & IMG_NAND) ret = (ValidateNandDump(argv[0]) == 0);
         else ret = (VerifyGameFile(argv[0]) == 0);
         if (err_str) snprintf(err_str, _ERR_STR_LEN, "verification failed");
     }
     else if (id == CMD_ID_DECRYPT) {
-        u64 filetype = IdentifyFileType(argv[0]);
+        u32 filetype = IdentifyFileType(argv[0]);
         if (filetype & BIN_KEYDB) ret = (CryptAesKeyDb(argv[0], true, false) == 0);
         else ret = (CryptGameFile(argv[0], true, false) == 0);
         if (err_str) snprintf(err_str, _ERR_STR_LEN, "decrypt failed");
     }
     else if (id == CMD_ID_ENCRYPT) {
-        u64 filetype = IdentifyFileType(argv[0]);
+        u32 filetype = IdentifyFileType(argv[0]);
         if (filetype & BIN_KEYDB) ret = (CryptAesKeyDb(argv[0], true, true) == 0);
         else ret = (CryptGameFile(argv[0], true, true) == 0);
         if (err_str) snprintf(err_str, _ERR_STR_LEN, "encrypt failed");
@@ -711,13 +711,13 @@ bool run_cmd(cmd_id id, u32 flags, char** argv, char* err_str) {
         if (err_str) snprintf(err_str, _ERR_STR_LEN, "build CIA failed");
     }
     else if (id == CMD_ID_EXTRCODE) {
-        u64 filetype = IdentifyFileType(argv[0]);
+        u32 filetype = IdentifyFileType(argv[0]);
         if ((filetype&(GAME_NCCH|FLAG_CXI)) != (GAME_NCCH|FLAG_CXI)) {
             ret = false;
             if (err_str) snprintf(err_str, _ERR_STR_LEN, "not a CXI file");
         } else {
             ShowString("Extracting .code, please wait...");
-            ret = (ExtractCodeFromCxiFile(argv[0], argv[1], NULL) == 0);
+            ret = (ExtractCodeFromCxiFile(argv[0], argv[1]) == 0);
             if (err_str) snprintf(err_str, _ERR_STR_LEN, "extract .code failed");
         }
     }
@@ -844,7 +844,7 @@ void MemTextView(const char* text, u32 len, char* line0, int off_disp, int lno, 
         bool ar = !ww && ((int) llen > off_disp + TV_LLEN_DISP);
         
         // set text color / find start of comment of scripts
-        u32 color_text = (nln == mno) ? script_color_active : (is_script) ? script_color_code : (u32) COLOR_TVTEXT;
+        u32 color_text = (nln == mno) ? script_color_active : (is_script) ? script_color_code : COLOR_TVTEXT;
         int cmt_start = TV_LLEN_DISP; // start of comment in current displayed line (may be negative)
         if (is_script && (nln != mno)) {
             char* hash = line_seek(text, len, 0, ptr, 0);
