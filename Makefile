@@ -16,9 +16,9 @@ include $(DEVKITARM)/ds_rules
 # INCLUDES is a list of directories containing header files
 # SPECS is the directory containing the important build and link files
 #---------------------------------------------------------------------------------
-export TARGET	:=	GodMode9
+export TARGET	:=	EixMode9
 ifeq ($(SAFEMODE),1)
-	export TARGET	:=	SafeMode9
+	export TARGET	:=	WeakMode9
 endif
 BUILD		:=	build
 SOURCES		:=	source source/common source/filesys source/crypto source/fatfs source/nand source/virtual source/game source/gamecart source/quicklz source/qrcodegen source/system source/utils
@@ -56,6 +56,14 @@ ifeq ($(SAFEMODE),1)
 	CFLAGS += -DSAFEMODE
 endif
 
+ifeq ($(AL3X10MODE),1)
+	CFLAGS += -DAL3X10MODE
+endif
+
+ifeq ($(EIXMODE),1)
+	CFLAGS += -DEIXMODE
+endif
+
 ifeq ($(SALTMODE),1)
 	CFLAGS += -DSALTMODE
 endif
@@ -64,12 +72,20 @@ ifeq ($(SWITCH_SCREENS),1)
 	CFLAGS += -DSWITCH_SCREENS
 endif
 
-ifeq ($(DISABLE_SLIDER),1)
-	CFLAGS += -DDISABLE_SLIDER
-endif
-
 ifneq ("$(wildcard $(CURDIR)/../$(DATA)/README.md)","")
 	CFLAGS += -DHARDCODE_README
+endif
+
+ifneq ("$(wildcard $(CURDIR)/../$(DATA)/CHANGELOG.md)","")
+	CFLAGS += -DHARDCODE_CHANGELOG
+endif
+
+ifneq ("$(wildcard $(CURDIR)/../$(DATA)/INFOBOX.md)","")
+	CFLAGS += -DHARDCODE_INFOBOX
+endif
+
+ifneq ("$(wildcard $(CURDIR)/../ $(DATA)/READMEE.md)","")
+	CFLAGS += -DHARDCODE_READMEE
 endif
 
 ifneq ("$(wildcard $(CURDIR)/../$(DATA)/aeskeydb.bin)","")
@@ -99,9 +115,10 @@ LIBDIRS	:=
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT_D	:=	$(CURDIR)/output
+export OUTPUT_D	:=	$(CURDIR)/out
 export OUTPUT	:=	$(OUTPUT_D)/$(TARGET)
 export RELEASE	:=	$(CURDIR)/release
+export EIXMODE  :=  $(CURDIR)/eix
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
@@ -112,6 +129,9 @@ CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/README.md))) \
+				$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/READMEE.md))) \
+				$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/CHANGELOG.md))) \
+				$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/INFOBOX.md))) \
 				$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/aeskeydb.bin))) \
 				$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/autorun.gm9)))
 ifeq ($(SAFEMODE),1)
