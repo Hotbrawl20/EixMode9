@@ -1819,6 +1819,9 @@ u32 GodMode(bool is_b9s) {
 	if (bootmenu) disp_mode = "bootmenu mode";
     show_splash = show_splash && bootmenu;
     #endif
+       #ifdef EIXMODE
+       if (bootmenu) disp_mode = "bootloader mode\nX for menu";
+    #endif
     
 	// show splash screen (if enabled)
     ClearScreenF(true, true, COLOR_STD_BG);
@@ -1941,7 +1944,7 @@ u32 GodMode(bool is_b9s) {
         if (~last_write_perm & GetWritePermissions()) {
             if (ShowPrompt(true, "Write permissions were changed.\nRelock them?")) SetWritePermissions(last_write_perm, false);
             last_write_perm = GetWritePermissions();
-            continue;
+            continue;//this shouldnt ever request a relock
         }
         
         // handle user input
