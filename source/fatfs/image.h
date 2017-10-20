@@ -10,6 +10,6 @@ int WriteImageSectors(const void* buffer, u32 sector, u32 count);
 int SyncImage(void);
 
 u64 GetMountSize(void);
-u64 GetMountState(void);
+u32 GetMountState(void);
 const char* GetMountPath(void);
-u64 MountImage(const char* path);
+u32 MountImage(const char* path);
