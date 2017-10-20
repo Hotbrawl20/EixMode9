@@ -6,6 +6,10 @@ Changelogs with #### are private builds
 Changelogs with ### are public builds
 
 ###
+Changelog for 1.4.3.9-E
+*Fixed a PERM lock
+
+###
 Changelog for 1.4.3.8-E
 *This is that last public build before i rebase
 *Removed undocumented feature (8) due to ntrboot errors,
