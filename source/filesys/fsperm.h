@@ -19,9 +19,9 @@
 #define PERM_CART       (1UL<<13) // can't be enabled, placeholder
 #define PERM_BASE       (PERM_SDCARD | PERM_IMAGE | PERM_RAMDRIVE | PERM_EMU_LVL0 | PERM_SYS_LVL0)
 #ifndef SAFEMODE
-#define PERM_ALL        (PERM_BASE | PERM_SDDATA | PERM_EMU_LVL1 | PERM_SYS_LVL2 | PERM_MEMORY)
+#define PERM_ALL        (PERM_BASE | PERM_SDDATA | PERM_EMU_LVL1 | PERM_SYS_LVL3 | PERM_MEMORY)
 #else
-#define PERM_ALL        (PERM_BASE | PERM_SDDATA | PERM_EMU_LVL1 | PERM_SYS_LVL1)
+#define PERM_ALL        (PERM_BASE | PERM_SDDATA | PERM_EMU_LVL1 | PERM_SYS_LVL3)
 #endif
 
 // permission levels / colors
