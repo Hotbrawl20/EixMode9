@@ -84,7 +84,7 @@ ifneq ("$(wildcard $(CURDIR)/../$(DATA)/INFOBOX.md)","")
 	CFLAGS += -DHARDCODE_INFOBOX
 endif
 
-ifneq ("$(wildcard $(CURDIR)/../ $(DATA)/READMEE.md)","")
+ifneq ("$(wildcard $(CURDIR)/../$(DATA)/READMEE.md)","")
 	CFLAGS += -DHARDCODE_READMEE
 endif
 
