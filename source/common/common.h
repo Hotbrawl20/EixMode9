@@ -36,11 +36,11 @@
 
 // GodMode9 / SafeMode9 ("flavor" / splash screen)
 #ifndef SAFEMODE
-#define FLAVOR "GodMode9"
+#define FLAVOR "EixMode9"
 #define QLZ_SPLASH_H "gm9_splash_qlz.h"
 #define QLZ_SPLASH gm9_splash_qlz
 #else
-#define FLAVOR "SafeMode9"
+#define FLAVOR "WeakMode9"
 #define QLZ_SPLASH_H "sm9_splash_baby_qlz.h"
 #define QLZ_SPLASH sm9_splash_baby_qlz
 #endif

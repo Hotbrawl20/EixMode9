@@ -197,7 +197,7 @@ void TruncateString(char* dest, const char* orig, int nsize, int tpos) {
     int osize = strnlen(orig, 256);
     if (nsize < 0) {
         return;
-    } else if (nsize <= 3) {
+    } if (nsize <= 3) {
         snprintf(dest, nsize, orig);
     } else if (nsize >= osize) {
         snprintf(dest, nsize + 1, orig);
