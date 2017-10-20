@@ -122,7 +122,7 @@ bool SetWritePermissions(u32 perm, bool add_perm) {
     }
     
     switch (perm) {
-        case PERM_BASE:
+        case PERM_BASE2:
             if (!ShowUnlockSequence(1, "You want to enable base\nwriting permissions."))
                 return false;
             break;
