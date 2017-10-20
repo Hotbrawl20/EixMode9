@@ -40,7 +40,7 @@
 #endif
 #ifdef HARDCODE_READMEE
 #include "READMEE_md.h"
-#else//thanks kazuma77!
+#else
 #define READMEE_md NULL
 #define READMEE_md_size 0
 #endif
@@ -291,7 +291,7 @@ void DrawUserInterface(const char* curr_path, DirEntry* curr_entry, DirStruct* c
     // bottom: inctruction block
     char instr[512];
     snprintf(instr, 512, "%s\n%s%s%s%s%s%s%s%s",
-        FLAVOR " Version: 1.4.3.8-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
+        FLAVOR " Version: 1.4.3.9-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
         (*curr_path) ? ((clipboard->n_entries == 0) ? "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - COPY files / [+R] CREATE entry\n" :
         "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - PASTE files / [+R] CREATE entry\n") :
         ((GetWritePermissions() > PERM_BASE) ? "IF YOU SEE THIS THEN REBOOT\n" : ""),
@@ -1819,10 +1819,9 @@ u32 GodMode(bool is_b9s) {
 	if (bootmenu) disp_mode = "bootmenu mode";
     show_splash = show_splash && bootmenu;
     #endif
-       #ifdef EIXMODE
-       if (bootmenu) disp_mode = "bootloader mode\nX for menu";
-    #endif
-    
+    #ifdef EIXMODE
+	if (bootmenu) disp_mode = "Eix Mode\nX for bootmenu";
+	#endif
 	// show splash screen (if enabled)
     ClearScreenF(true, true, COLOR_STD_BG);
     if (show_splash) SplashInit(disp_mode);
@@ -1944,7 +1943,7 @@ u32 GodMode(bool is_b9s) {
         if (~last_write_perm & GetWritePermissions()) {
             if (ShowPrompt(true, "Write permissions were changed.\nRelock them?")) SetWritePermissions(last_write_perm, false);
             last_write_perm = GetWritePermissions();
-            continue;//this shouldnt ever request a relock
+            continue;//should never request a relock
         }
         
         // handle user input
