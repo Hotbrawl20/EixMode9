@@ -40,6 +40,7 @@
 #endif
 #ifdef HARDCODE_READMEE
 #include "READMEE_md.h"
+#else//thanks kazuma77!
 #define READMEE_md NULL
 #define READMEE_md_size 0
 #endif
