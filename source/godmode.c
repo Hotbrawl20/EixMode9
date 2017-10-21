@@ -291,7 +291,7 @@ void DrawUserInterface(const char* curr_path, DirEntry* curr_entry, DirStruct* c
     // bottom: inctruction block
     char instr[512];
     snprintf(instr, 512, "%s\n%s%s%s%s%s%s%s%s",
-        FLAVOR " Version: 1.4.3.9-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
+        FLAVOR " Version: 1.4.3.10-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
         (*curr_path) ? ((clipboard->n_entries == 0) ? "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - COPY files / [+R] CREATE entry\n" :
         "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - PASTE files / [+R] CREATE entry\n") :
         ((GetWritePermissions() > PERM_BASE) ? "IF YOU SEE THIS THEN REBOOT\n" : ""),
@@ -1594,7 +1594,7 @@ u32 HomeMoreMenu(char* current_path, DirStruct* current_dir, DirStruct* clipboar
     if (sysinfo > 0) optionstr[sysinfo - 1] = "System info";
     if (readme > 0) optionstr[readme - 1] = "Show EixMode9 ReadMe";//who needs to read these things anyways??? i have 3gb of these sitting on my hdd because i just move them to a single folder :P
     if (changelog > 0) optionstr[changelog - 1] = "Show ChangeLog";
-    if (readmee > 0) optionstr[readmee - 1] = "Show ModMode9 ReadMe";
+    if (readmee > 0) optionstr[readmee - 1] = "Show GodMode9 ReadMe";
     if (infobox > 0) optionstr[infobox - 1] = "Show Info Box";
     if (placeholder > 0) optionstr[placeholder - 1] = "PLACEHOLDER";//plzwork
 
@@ -1751,7 +1751,7 @@ u32 HomeMoreMenu(char* current_path, DirStruct* current_dir, DirStruct* clipboar
 }
 
 u32 SplashInit(const char* modestr) {
-    const char* namestr = FLAVOR " Version: 1.4.3.9-E" VERSION;
+    const char* namestr = FLAVOR " Version: 1.4.3.10-E" VERSION;
     const char* loadstr = "Booting...";
     const u32 pos_xb = 10;
     const u32 pos_yb = 10;
