@@ -6,6 +6,10 @@ Changelogs with #### are private builds
 Changelogs with ### are public builds
 
 ###
+Changelog for 1.4.3.10-E
+*Fixed a minor fuck up in the spelling
+
+###
 Changelog for 1.4.3.9-E
 *Fixed a PERM lock
 
