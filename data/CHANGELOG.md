@@ -4,6 +4,30 @@ use up and down to scroll through sections
 the latest will always be on top
 Changelogs with #### are private builds
 Changelogs with ### are public builds
+#####
+important note
+*this is a pre release so it will be non compiled
+*does not contain the 1.4.3.11-E stuff
+
+###
+Changelog for 1.4.3.12-E
+*Added some flashy battery colors
+*synced some stuff
+
+#####
+Stuff
+*vram0.img
+*godmode.c
+
+####
+Changelog for 1.4.3.10-E
+*idr so later im gonna add this correctly
+*Got a new tester!
+*added some experimental stuff
+
+#####
+Tester
+SSQ
 
 ###
 Changelog for 1.4.3.10-E
