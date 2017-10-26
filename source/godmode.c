@@ -82,7 +82,7 @@
 #define BOOTFIRM_PATHS  "C:/*.firm", "0:/Eix.firm", "1:/Eix.firm", "4:/Eix.firm", "8:/Eix.firm", "2:/Eix.firm", "3:/Eix.firm", "A:/Eix.firm", "5:/Eix.firm", "6:/Eix.firm", "B:/Eix.firm", "9:/Eix.firm"//just incase it ever becomes a thing! (C:)
 //loading from gamecard before anything else? secret plans for a brick tool cart? the world will never know... but dun worry i wouldnt want to brick your system
 #define COLOR_TOP_BAR   (PERM_RED ? COLOR_DARKESTGREY : PERM_ORANGE ? COLOR_DARKESTGREY : PERM_BLUE ? COLOR_DARKESTGREY : PERM_YELLOW ? COLOR_DARKESTGREY : PERM_GREEN ? COLOR_WHITE : COLOR_WHITE)  //not sure if this works
-#endif //Burst into bloom... oh fuck! wrong waifu!
+#endif
 
 #ifdef SALTMODE // ShadowHand's own bootmenu key override
 #define BOOTMENU_KEY    BUTTON_START
@@ -134,9 +134,9 @@ void CheckBattery(u32* battery, bool* is_charging) {
 }
 
 void GenerateBatteryBitmap(u8* bitmap, u32 width, u32 height, u32 color_bg) {
-    const u32 color_outline = COLOR_ORANGE;
+    const u32 color_outline = COLOR_ORANGE;//i would have this set to blue but i have COLOR_ORANGE set to blue
     const u32 color_inline = COLOR_BLACK;
-    const u32 color_inside = COLOR_GREY;//this may not be the best color but im too lazy to fix it rn, maybe next public release
+    const u32 color_inside = COLOR_DARKGREY;//this color should look better
     
     if ((width < 8) || (height < 6)) return;
     
@@ -144,8 +144,8 @@ void GenerateBatteryBitmap(u8* bitmap, u32 width, u32 height, u32 color_bg) {
     bool is_charging;
     CheckBattery(&battery, &is_charging);
     
-    u32 color_battery = (is_charging) ? COLOR_BLUE :
-        (battery > 75) ? COLOR_GREEN : (battery > 50) ? COLOR_YELLOW : (battery > 25) ? COLOR_ORANGE : COLOR_RED;
+    u32 color_battery = (is_charging) ? COLOR_TINTEDBLUE :
+        (battery > 90) ? COLOR_WHITE : (battery > 80) ? COLOR_BRIGHTBLUE : (battery > 70) ? COLOR_BLUE : (battery > 60) ? COLOR_GREEN : (battery > 50) ? COLOR_TINTEDGREEN : (battery > 40) ? COLOR_BRIGHTYELLOW : (battery > 30) ? COLOR_YELLOW : (battery > 20) ? COLOR_TINTEDYELLOW : (battery > 10) ? COLOR_RED : COLOR_BLACK;//super flashy battery indicator :P
     u32 nub_size = (height < 12) ? 1 : 2;
     u32 width_inside = width - 4 - nub_size;
     u32 width_battery = (battery >= 100) ? width_inside : ((battery * width_inside) + 50) / 100;
@@ -291,10 +291,10 @@ void DrawUserInterface(const char* curr_path, DirEntry* curr_entry, DirStruct* c
     // bottom: inctruction block
     char instr[512];
     snprintf(instr, 512, "%s\n%s%s%s%s%s%s%s%s",
-        FLAVOR " Version: 1.4.3.10-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
+        FLAVOR " Version: 1.4.3.12-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
         (*curr_path) ? ((clipboard->n_entries == 0) ? "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - COPY files / [+R] CREATE entry\n" :
         "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - PASTE files / [+R] CREATE entry\n") :
-        ((GetWritePermissions() > PERM_BASE) ? "IF YOU SEE THIS THEN REBOOT\n" : ""),
+        ((GetWritePermissions() > PERM_BASE) ? "github.com/eiiiiix/EixMode9/issues\n" : ""),//make an issue if you see this
         (*curr_path) ? "" : (GetMountState()) ? "R+X - Unmount image\n" : "",
         (*curr_path) ? "" : (CheckSDMountState()) ? "R+B - Unmount SD card\n" : "R+B - Remount SD card\n",
         (*curr_path) ? "R+A - Directory options\n" : "R+A - Drive options\n", 
@@ -1751,7 +1751,7 @@ u32 HomeMoreMenu(char* current_path, DirStruct* current_dir, DirStruct* clipboar
 }
 
 u32 SplashInit(const char* modestr) {
-    const char* namestr = FLAVOR " Version: 1.4.3.10-E" VERSION;
+    const char* namestr = FLAVOR " Version: 1.4.3.12-E" VERSION;
     const char* loadstr = "Booting...";
     const u32 pos_xb = 10;
     const u32 pos_yb = 10;
@@ -1765,9 +1765,9 @@ u32 SplashInit(const char* modestr) {
     
     DrawStringF(BOT_SCREEN, pos_xb, pos_yb, COLOR_STD_FONT, COLOR_STD_BG, "%s\n%*.*s\n%s\n \n \n%s\n%s\n \n%s\n%s",
         namestr, strnlen(namestr, 64), strnlen(namestr, 64),
-        "-------------------------------", "Burst into bloom... Amaryllis!",//release name and message should not exceed the line //wrong waifu i know, but shes a good waifu, she can explode you too
+        "-------------------------------", "[generic waifu thing]",//release name and message should not exceed the line //wrong waifu i know, but shes a good waifu, she can explode you too
         "Mod by:", "Eix",
-        "I need testers!", "home > more... > Show Info Box");
+        "Main Tester:", "SSQ");
     DrawStringF(BOT_SCREEN, pos_xu, pos_yu, COLOR_STD_FONT, COLOR_STD_BG, loadstr);
     DrawStringF(BOT_SCREEN, pos_xb, pos_yu, COLOR_STD_FONT, COLOR_STD_BG, "Compiled: " DBUILTL);
     
