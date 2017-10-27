@@ -59,7 +59,7 @@
 
 #define N_PANES 10
 
-#define COLOR_TOP_BAR   (PERM_RED ? COLOR_RED : PERM_ORANGE ? COLOR_ORANGE : PERM_BLUE ? COLOR_BRIGHTBLUE : \
+#define COLOR_TOP_BAR   (PERM_EIX ? COLOR_EIX : PERM_RED ? COLOR_RED : PERM_ORANGE ? COLOR_BRIGHTBLUE : PERM_BLUE ? COLOR_BRIGHTBLUE : \
                          PERM_YELLOW ? COLOR_BRIGHTYELLOW : PERM_GREEN ? COLOR_GREEN : COLOR_WHITE)   
 #define COLOR_SIDE_BAR  COLOR_DARKGREY
 #define COLOR_MARKED    COLOR_TINTEDYELLOW
@@ -145,7 +145,7 @@ void GenerateBatteryBitmap(u8* bitmap, u32 width, u32 height, u32 color_bg) {
     CheckBattery(&battery, &is_charging);
     
     u32 color_battery = (is_charging) ? COLOR_TINTEDBLUE :
-        (battery > 90) ? COLOR_WHITE : (battery > 80) ? COLOR_BRIGHTBLUE : (battery > 70) ? COLOR_BLUE : (battery > 60) ? COLOR_GREEN : (battery > 50) ? COLOR_TINTEDGREEN : (battery > 40) ? COLOR_BRIGHTYELLOW : (battery > 30) ? COLOR_YELLOW : (battery > 20) ? COLOR_TINTEDYELLOW : (battery > 10) ? COLOR_RED : COLOR_BLACK;//super flashy battery indicator :P
+        (battery > 75) ? COLOR_GREEN : (battery > 50) ? COLOR_YELLOW : (battery > 25) ? COLOR_ORANGE : (battery > 5) ? COLOR_RED : COLOR_PURPLE;
     u32 nub_size = (height < 12) ? 1 : 2;
     u32 width_inside = width - 4 - nub_size;
     u32 width_battery = (battery >= 100) ? width_inside : ((battery * width_inside) + 50) / 100;
@@ -291,7 +291,7 @@ void DrawUserInterface(const char* curr_path, DirEntry* curr_entry, DirStruct* c
     // bottom: inctruction block
     char instr[512];
     snprintf(instr, 512, "%s\n%s%s%s%s%s%s%s%s",
-        FLAVOR " Version: 1.4.3.12-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
+        FLAVOR " Version: 1.4.3.13-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
         (*curr_path) ? ((clipboard->n_entries == 0) ? "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - COPY files / [+R] CREATE entry\n" :
         "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - PASTE files / [+R] CREATE entry\n") :
         ((GetWritePermissions() > PERM_BASE) ? "github.com/eiiiiix/EixMode9/issues\n" : ""),//make an issue if you see this
@@ -1751,7 +1751,7 @@ u32 HomeMoreMenu(char* current_path, DirStruct* current_dir, DirStruct* clipboar
 }
 
 u32 SplashInit(const char* modestr) {
-    const char* namestr = FLAVOR " Version: 1.4.3.12-E" VERSION;
+    const char* namestr = FLAVOR " Version: 1.4.3.13-E" VERSION;
     const char* loadstr = "Booting...";
     const u32 pos_xb = 10;
     const u32 pos_yb = 10;
