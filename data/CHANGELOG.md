@@ -20,8 +20,9 @@ Stuff
 *godmode.c
 
 ####
-Changelog for 1.4.3.10-E
-*idr so later im gonna add this correctly
+Changelog for 1.4.3.11-E
+*Added write perms for read only places to get rid of the
+annoying nag, these are nonfunctional
 *Got a new tester!
 *added some experimental stuff
 
