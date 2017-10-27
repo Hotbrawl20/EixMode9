@@ -35,7 +35,9 @@
 #define COLOR_BLUE          RGB(0x00, 0x00, 0xFF)
 #define COLOR_YELLOW        RGB(0xFF, 0xFF, 0x00)
 #define COLOR_CYAN          RGB(0xFF, 0x00, 0xFF)
-#define COLOR_ORANGE        RGB(0x00, 0x00, 0xFF)
+#define COLOR_ORANGE        RGB(0xFF, 0x57, 0x33)
+#define COLOR_EIX           RGB(0x4C, 0x43, 0x51)//nice color, idk how it will show up on 3ds screen
+#define COLOR_PURPLE        RGB(ox4C, 0x43, 0x51)//^
 
 #define COLOR_BRIGHTRED     RGB(0xFF, 0x30, 0x30)
 #define COLOR_DARKRED       RGB(0x80, 0x00, 0x00)
