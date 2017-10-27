@@ -32,7 +32,7 @@
 #define PERM_ORANGE     (GetWritePermissions()&(PERM_SYS_LVL2&~PERM_SYS_LVL1))
 #define PERM_YELLOW     (GetWritePermissions()&((PERM_SYS_LVL1&~PERM_SYS_LVL0)|(PERM_EMU_LVL1&~PERM_EMU_LVL0)|(PERM_SDDATA&~PERM_SDCARD)))
 #define PERM_GREEN      (GetWritePermissions()&(PERM_SDCARD|PERM_IMAGE|PERM_RAMDRIVE|PERM_EMU_LVL0|PERM_SYS_LVL0))
-// was going to add this but ive changed my mind //#define PERM_EIX        (GetWritePermissions()&(PERM_GAME|PERM_XORPAD|PERM_CART)) // this is not going to work, dont try it
+#define PERM_EIX        (GetWritePermissions()&(PERM_GAME|PERM_XORPAD|PERM_CART)) // this is not going to work, dont try it
 //Megumin is the best girl!
 
 /** Check if writing to this path is allowed **/
