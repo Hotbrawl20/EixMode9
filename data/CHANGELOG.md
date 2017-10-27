@@ -10,6 +10,11 @@ important note
 *does not contain the 1.4.3.11-E stuff
 
 ###
+Changelog for 1.4.3.13-E
+*Battery colors
+*New colors
+
+###
 Changelog for 1.4.3.12-E
 *Added some flashy battery colors
 *synced some stuff
