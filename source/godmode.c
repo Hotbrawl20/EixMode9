@@ -12,6 +12,7 @@
 #include "nandutil.h"
 #include "filetype.h"
 #include "unittype.h"
+#include "entrypoints.h"
 #include "nand.h"
 #include "virtual.h"
 #include "vcart.h"
@@ -291,7 +292,7 @@ void DrawUserInterface(const char* curr_path, DirEntry* curr_entry, DirStruct* c
     // bottom: inctruction block
     char instr[512];
     snprintf(instr, 512, "%s\n%s%s%s%s%s%s%s%s",
-        FLAVOR " Version: 1.4.3.13-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
+        FLAVOR " Version: 1.4.3.14-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
         (*curr_path) ? ((clipboard->n_entries == 0) ? "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - COPY files / [+R] CREATE entry\n" :
         "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - PASTE files / [+R] CREATE entry\n") :
         ((GetWritePermissions() > PERM_BASE) ? "github.com/eiiiiix/EixMode9/issues\n" : ""),//make an issue if you see this
@@ -1751,7 +1752,7 @@ u32 HomeMoreMenu(char* current_path, DirStruct* current_dir, DirStruct* clipboar
 }
 
 u32 SplashInit(const char* modestr) {
-    const char* namestr = FLAVOR " Version: 1.4.3.13-E" VERSION;
+    const char* namestr = FLAVOR " Version: 1.4.3.14-E" VERSION;
     const char* loadstr = "Booting...";
     const u32 pos_xb = 10;
     const u32 pos_yb = 10;
@@ -1765,7 +1766,7 @@ u32 SplashInit(const char* modestr) {
     
     DrawStringF(BOT_SCREEN, pos_xb, pos_yb, COLOR_STD_FONT, COLOR_STD_BG, "%s\n%*.*s\n%s\n \n \n%s\n%s\n \n%s\n%s",
         namestr, strnlen(namestr, 64), strnlen(namestr, 64),
-        "-------------------------------", "[generic waifu thing]",//release name and message should not exceed the line //wrong waifu i know, but shes a good waifu, she can explode you too
+        "-------------------------------", "https://discord.gg/6mEKUG5",//release name and message should not exceed the line
         "Mod by:", "Eix",
         "Main Tester:", "SSQ");
     DrawStringF(BOT_SCREEN, pos_xu, pos_yu, COLOR_STD_FONT, COLOR_STD_BG, loadstr);
@@ -1774,7 +1775,7 @@ u32 SplashInit(const char* modestr) {
     return 0;
 }
 
-u32 GodMode(bool is_b9s) {
+u32 GodMode(int entrypoint) {
     const u32 quick_stp = (MAIN_SCREEN == TOP_SCREEN) ? 20 : 19;
     u32 exit_mode = GODMODE_EXIT_POWEROFF;
     
@@ -1791,8 +1792,7 @@ u32 GodMode(bool is_b9s) {
     u32 cursor = 0;
     u32 scroll = 0;
     
-    u32 boot_origin = GetBootOrigin();
-    bool bootloader = !is_b9s && IS_SIGHAX && (boot_origin & BOOT_NAND);
+    bool bootloader = IS_SIGHAX && (entrypoint == ENTRY_NANDBOOT);
     bool bootmenu = bootloader && CheckButton(BOOTMENU_KEY);
     bool godmode9 = !bootloader;
     FirmHeader* firm_in_mem = (FirmHeader*) (void*) (TEMP_BUFFER + TEMP_BUFFER_SIZE); // should be safe here
@@ -1810,9 +1810,9 @@ u32 GodMode(bool is_b9s) {
     // get mode string for splash screen
     const char* disp_mode = NULL;
     if (bootloader) disp_mode = "bootloader mode\nR for menu";
-    else if (!is_b9s && !IS_SIGHAX) disp_mode = "OldLoader mode";
-    else if (!is_b9s && IS_SIGHAX && (boot_origin & BOOT_NTRBOOT)) disp_mode = "NTRBoot mode";
-    // else if (!is_b9s || !IS_SIGHAX) disp_mode = "unknown mode";
+    else if (!IS_SIGHAX && (entrypoint == ENTRY_NANDBOOT)) disp_mode = "oldloader mode";
+    else if (entrypoint == ENTRY_NTRBOOT) disp_mode = "ntrboot mode";
+    else if (entrypoint == ENTRY_UNKNOWN) disp_mode = "unknown mode";
 	
 	bool show_splash = true;
 	#ifdef SALTMODE
@@ -1834,7 +1834,7 @@ u32 GodMode(bool is_b9s) {
     
     InitSDCardFS();
     AutoEmuNandBase(true);
-    InitNandCrypto(!is_b9s);
+    InitNandCrypto(entrypoint != ENTRY_B9S);
     InitExtFS();
     
     // check for embedded essential backup
@@ -1862,7 +1862,7 @@ u32 GodMode(bool is_b9s) {
     }
     
     // check aeskeydb.bin / key state
-    if (!is_b9s && (CheckRecommendedKeyDb(NULL) != 0)) {
+    if (entrypoint != ENTRY_B9S && (CheckRecommendedKeyDb(NULL) != 0)) {
         ShowPrompt(false, "WARNING:\nNot running from a boot9strap\ncompatible entrypoint. Not\neverything may work as expected.\n \nProvide the recommended\naeskeydb.bin file to make this\nwarning go away.");
     }
     
@@ -2332,7 +2332,7 @@ u32 GodMode(bool is_b9s) {
 }
 
 #ifdef AUTORUN_SCRIPT
-u32 ScriptRunner(bool is_b9s) {
+u32 ScriptRunner(int entrypoint) {
     // show splash and initialize
     ClearScreenF(true, true, COLOR_STD_BG);
     SplashInit("scriptrunner mode");
@@ -2340,7 +2340,7 @@ u32 ScriptRunner(bool is_b9s) {
     
     InitSDCardFS();
     AutoEmuNandBase(true);
-    InitNandCrypto(!is_b9s);
+    InitNandCrypto(entrypoint != ENTRY_B9S;
     InitExtFS();
     
     while (CheckButton(BUTTON_A)); // don't continue while A is held
