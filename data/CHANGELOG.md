@@ -1,28 +1,50 @@
 ##
+##
 Changelogs
 use up and down to scroll through sections
 the latest will always be on top
-Changelogs with #### are private builds
-Changelogs with ### are public builds
+Entrys with #### are private builds
+Entrys with ### are public builds
+Entrys with ##### are notes
+Entrys with ###### are file changes
 #####
-important note
-*this is a pre release so it will be non compiled
-*does not contain the 1.4.3.11-E stuff
+Pre Releases are uncompiled
+
+###
+Changelog for 1.4.3.14-E
+*Scraped the 1.4.3.11-E stuff
+*Added the cool new entrypoint detector
+*Improvement to system stability and convenience
+*Cleaned up CHANGELOG.md a little
+
+######
+Files changed
+*source/godmode.c
+*source/common/entrypoints.h
+*source/godmode.h
+*source/main.c
+*source/start.s
+*source/nand/nand.c
+*source/nand/nand.h
+*source/utils/scripting.c
+*data/CHANGELOG.md
 
 ###
 Changelog for 1.4.3.13-E
 *Battery colors
 *New colors
+*Improvement to system stability and convenience
 
 ###
 Changelog for 1.4.3.12-E
 *Added some flashy battery colors
 *synced some stuff
+*Improvement to system stability and convenience
 
-#####
-Stuff
-*vram0.img
-*godmode.c
+######
+Files changed
+*data/vram0.img
+*source/godmode.c
 
 ####
 Changelog for 1.4.3.11-E
@@ -30,6 +52,7 @@ Changelog for 1.4.3.11-E
 annoying nag, these are nonfunctional
 *Got a new tester!
 *added some experimental stuff
+*Improvement to system stability and convenience
 
 #####
 Tester
@@ -38,10 +61,12 @@ SSQ
 ###
 Changelog for 1.4.3.10-E
 *Fixed a minor fuck up in the spelling
+*Improvement to system stability and convenience
 
 ###
 Changelog for 1.4.3.9-E
 *Fixed a PERM lock
+*Improvement to system stability and convenience
 
 ###
 Changelog for 1.4.3.8-E
@@ -54,43 +79,32 @@ this build with a fully hardcoded aeskeydb.bin
 *All public builds after and including this one will be in
 EIXMODE because it looks sexier, if you want a different
 mode then either ask me nicely or build it yourself
-*If you actually use this and check the changelog then vote
-on what i should do! www.strawpoll.me/14166709 if the none
-of the options gets more than 5 votes then im just going to
-rebase and add more megumin in the source
+*Improvement to system stability and convenience
 
 ####
 Changelog for 1.4.3.7-E
 *removed giant vram0.img (M:/vram.mem) because it wouldnt
 mount :/
-*updated data/CHANGLOG.md
-*updated data/INFOBOX.md
+*Improvement to system stability and convenience
+
+######
+Files changed
+*data/CHANGLOG.md
+*data/INFOBOX.md
 
 ####
 Changelog for 1.4.3.6-E
 *Thanks to VinsCool i added a undocumented feature (8)
-*Failed to add a load boot menu - again -_-
 *Added stuff to the vram0.img (M:/vram.mem)
-*vram0.img should be mountable - its not so i reverted back
-to a txt file
-*Merged a bunch of stuff that was added in the offical 1.4.3
-i think i got all of it - nope didnt build, reverting until
-something big happens
-*Hopefully didnt fuck up and this builds - i did, lucky me i
-always make a copy before testing my eixplosion magic
 *Temporarily lost my main tester and only tester, i need new
 testers!
-*Refurbished the CHANGELOG.md - should look nicer
-*Readded legacy paths for support files - caused problems, i
-can see why they get removed, sorry older ppl
-*Added gm9 script scanning for (0:) because im lazy :P
+*Refurbished the CHANGELOG.md
+*Added gm9 script scanning for (0:)
 *Added gm9 scripts for booting from more drives
-*Added more eixplosions
 *You can now drag&drop gm9 scripts to the root of the sd and
-load them from the scripts menu, i think
+load them from the scripts menu
 *updated INFOBOX.md
-*Added back the offical readme - i spelt something wrong
-first time i did this and that fucked it up XD
+*Added back the offical readme
 *Improvement to system stability and convenience
 
 #####
