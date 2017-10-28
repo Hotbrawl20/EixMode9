@@ -7,15 +7,30 @@ Entrys with #### are private builds
 Entrys with ### are public builds
 Entrys with ##### are notes
 Entrys with ###### are file changes
+
 #####
 Pre Releases are uncompiled
+
+###
+Changelog for 1.4.3.15-E
+*Reordered the HOMEMore...Menu
+*Fixed bootmenu saying GodMode9
+*Cleaned vram0.img a little bit
+*All builds will now contain SALT AL3X10 and EIX builds
+*Improvement to system stability and convenience
+
+######
+Files changed
+*source/godmode.c
+*data/vram0.img
+*data/CHANGELOG.md
 
 ###
 Changelog for 1.4.3.14-E
 *Scraped the 1.4.3.11-E stuff
 *Added the cool new entrypoint detector
-*Improvement to system stability and convenience
 *Cleaned up CHANGELOG.md a little
+*Improvement to system stability and convenience
 
 ######
 Files changed

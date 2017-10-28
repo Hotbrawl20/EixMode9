@@ -292,7 +292,7 @@ void DrawUserInterface(const char* curr_path, DirEntry* curr_entry, DirStruct* c
     // bottom: inctruction block
     char instr[512];
     snprintf(instr, 512, "%s\n%s%s%s%s%s%s%s%s",
-        FLAVOR " Version: 1.4.3.14-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
+        FLAVOR " Version: 1.4.3.15-E" VERSION, // generic start part //im going to be using this to display version info because the terminal hates me XD
         (*curr_path) ? ((clipboard->n_entries == 0) ? "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - COPY files / [+R] CREATE entry\n" :
         "L - MARK files (use with \x18\x19\x1A\x1B)\nX - DELETE / [+R] RENAME file(s)\nY - PASTE files / [+R] CREATE entry\n") :
         ((GetWritePermissions() > PERM_BASE) ? "github.com/eiiiiix/EixMode9/issues\n" : ""),//make an issue if you see this
@@ -1752,7 +1752,7 @@ u32 HomeMoreMenu(char* current_path, DirStruct* current_dir, DirStruct* clipboar
 }
 
 u32 SplashInit(const char* modestr) {
-    const char* namestr = FLAVOR " Version: 1.4.3.14-E" VERSION;
+    const char* namestr = FLAVOR " Version: 1.4.3.15-E" VERSION;
     const char* loadstr = "Booting...";
     const u32 pos_xb = 10;
     const u32 pos_yb = 10;
@@ -1876,7 +1876,7 @@ u32 GodMode(int entrypoint) {
     if (bootmenu) {
         bootloader = false;
         while (!bootloader && !godmode9) {
-            const char* optionstr[6] = { "Resume bootloader", "Resume GodMode9", "Select payload...", "Select script...",
+            const char* optionstr[6] = { "Resume", "Launch EixMode9", "Select payload...", "Select script...",
                 "Reboot system", "Poweroff system" };
             int user_select = ShowSelectPrompt(6, optionstr, FLAVOR " bootloader menu.\nSelect action:");
             char loadpath[256];
@@ -1941,7 +1941,7 @@ u32 GodMode(int entrypoint) {
         
         // check write permissions
         if (~last_write_perm & GetWritePermissions()) {
-            if (ShowPrompt(true, "Write permissions were changed.\nRelock them?")) SetWritePermissions(last_write_perm, false);
+            if (ShowPrompt(true, "Possible PERM lock\nSubmit an issue please")) SetWritePermissions(last_write_perm, false);
             last_write_perm = GetWritePermissions();
             continue;//should never request a relock
         }
@@ -2242,7 +2242,7 @@ u32 GodMode(int entrypoint) {
                     const char* typestr = (type == 1) ? "folder" : (type == 2) ? "file" : NULL;
                     char ename[256];
                     u64 fsize = 0;
-                    snprintf(ename, 255, (type == 1) ? "newdir" : "dummy.bin");
+                    snprintf(ename, 255, (type == 1) ? "Folder" : "File");
                     if ((ShowStringPrompt(ename, 256, "Create a new %s here?\nEnter name below.", typestr)) &&
                         ((type != 2) || ((fsize = ShowNumberPrompt(0, "Create a new %s here?\nEnter file size below.", typestr)) != (u64) -1))) {
                         if (((type == 1) && !DirCreate(current_path, ename)) ||
@@ -2267,16 +2267,16 @@ u32 GodMode(int entrypoint) {
             const char* optionstr[8];
             const char* buttonstr = (pad_state & BUTTON_HOME) ? "HOME" : "POWER";
             u32 n_opt = 0;
+            int payloads = (PathExist(PAYLOAD_PATH)) ? (int) ++n_opt : -1;
+            int scripts = (PathExist(SCRIPT_PATH)) ? (int) ++n_opt : -1;
             int poweroff = ++n_opt;
             int reboot = ++n_opt;
-            int scripts = (PathExist(SCRIPT_PATH)) ? (int) ++n_opt : -1;
-            int payloads = (PathExist(PAYLOAD_PATH)) ? (int) ++n_opt : -1;
             int more = ++n_opt;
 
+            if (payloads > 0) optionstr[payloads - 1] = "Payloads...";
+            if (scripts > 0) optionstr[scripts - 1] = "Scripts...";
             if (poweroff > 0) optionstr[poweroff - 1] = "Poweroff system";
             if (reboot > 0) optionstr[reboot - 1] = "Reboot system";
-            if (scripts > 0) optionstr[scripts - 1] = "Scripts...";
-            if (payloads > 0) optionstr[payloads - 1] = "Payloads...";
             if (more > 0) optionstr[more - 1] = "More...";
 
             int user_select = 0;
