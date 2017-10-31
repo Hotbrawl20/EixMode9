@@ -2,7 +2,7 @@ this is my new todo list
 this is not meant to be understandable
 move along
 -t
---de
+--de/30% done
 --sp
 --pr
 --ir
@@ -12,4 +12,4 @@ move along
 -te
 --gsogh/nvm i gave
 -th
---MHTF/gona release this edit tomorrow morning :)
+--MHTF/fuck this no time for it, maybe next year
